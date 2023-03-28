@@ -13,12 +13,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Startup Name Generator',
-      theme: ThemeData(          // Add the 5 lines from here...
+      theme: ThemeData(
         appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black,
+          backgroundColor: Colors.deepPurple,
+          foregroundColor: Colors.white,
         ),
-      ),                         // ... to here.
+      ),
       home: RandomWords(),
     );
   }
@@ -35,16 +35,46 @@ class _RandomWordsState extends State<RandomWords> {
   final _suggestions = <WordPair>[];
   final _saved = <WordPair>{};
   final _biggerFont = const TextStyle(fontSize: 18);
-  void _pushSaved(){
+
+  void _showSavedSuggestionSnackbar(BuildContext context) {
+    final snackBar = SnackBar(content: Text('Deletion is not implemented yet'));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+  void _pushSaved() {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (context) {
           final tiles = _saved.map(
                 (pair) {
-              return ListTile(
-                title: Text(
-                  pair.asPascalCase,
-                  style: _biggerFont,
+              return Dismissible(
+                key: Key(pair.toString()),
+                background: Container(
+                  color: Colors.red,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Icon(
+                        Icons.delete,
+                        color: Colors.white,
+                      ),
+                      const SizedBox(width: 20),
+                    ],
+                  ),
+                ),
+                direction: DismissDirection.horizontal,
+                confirmDismiss: (direction) async {
+                  if (direction == DismissDirection.endToStart || direction == DismissDirection.startToEnd) {
+                    // User swiped from right to left or left to right (i.e. dismissed the item)
+                    _showSavedSuggestionSnackbar(context);
+                    return false;
+                  }
+                },
+
+                child: ListTile(
+                  title: Text(
+                    pair.asPascalCase,
+                    style: _biggerFont,
+                  ),
                 ),
               );
             },
@@ -61,11 +91,81 @@ class _RandomWordsState extends State<RandomWords> {
               title: const Text('Saved Suggestions'),
             ),
             body: ListView(children: divided),
+            // Show Snackbar when Login button is pressed
           );
         },
       ),
     );
   }
+
+  void _pushLogin(){
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (context) {
+
+          return Scaffold(
+            appBar: AppBar(
+              title: const Text(
+                'Login',
+                style: const TextStyle(
+                color: Colors.white,
+              ),
+              ),
+            ),
+            body: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const Text(
+                    'Welcome to Startup Names Generator, please log in!',
+                    style: TextStyle(
+                      fontSize: 12.0,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16.0),
+                  TextFormField(
+                    decoration: InputDecoration(
+                      labelText: 'Email',
+                    ),
+                  ),
+                  const SizedBox(height: 16.0),
+                  TextFormField(
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      labelText: 'Password',
+                    ),
+                  ),
+                  const SizedBox(height: 16.0),
+                  ElevatedButton(
+                    onPressed: () {
+                      // Perform login authentication here
+                      _showLoginSnackbar(context);
+                    },
+                    child: const Text('Login'),
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.deepPurple, // Sets the background color to purple
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30), // Sets the border radius to 30
+                      ),
+                      padding: EdgeInsets.symmetric(horizontal: 40), // Sets the horizontal padding
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  void _showLoginSnackbar(BuildContext context) {
+    final snackBar = SnackBar(content: Text('Login is not implemented yet'));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -73,9 +173,13 @@ class _RandomWordsState extends State<RandomWords> {
         title: const Text('Startup Name Generator'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.list),
+            icon: const Icon(Icons.star),
             onPressed: _pushSaved,
             tooltip: 'Saved Suggestions',
+          ),
+          IconButton(
+            icon: const Icon(Icons.login),
+            onPressed: _pushLogin,
           )
         ],
       ),
@@ -114,3 +218,5 @@ class _RandomWordsState extends State<RandomWords> {
     );
   }
 }
+
+
