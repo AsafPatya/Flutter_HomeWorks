@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:english_words/english_words.dart';
 import 'Screens/startup_name_generator_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'Screens/login_screen.dart';
 
 
 void main() {
@@ -44,7 +45,7 @@ class MyApp extends StatelessWidget {
           foregroundColor: Colors.white,
         ),
       ),
-      home: RandomWordsScreen(),
+      home: LoginScreen(),
     );
   }
 }

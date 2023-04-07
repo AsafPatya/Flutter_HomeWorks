@@ -12,10 +12,10 @@ class _LoginScreenState extends State<LoginScreen> {
   final double paddingSize = 16;
   final TextEditingController txtHeight = TextEditingController();
   final TextEditingController txtWeight = TextEditingController();
+  final Login login = Login();
 
   @override
   Widget build(BuildContext context) {
-    Login login = Login();
     return Scaffold(
       appBar: AppBar(
         title: Text(login.appBarLogin,
@@ -56,10 +56,19 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Text(login.loginButtonText),
               style: ElevatedButton.styleFrom(
                 primary: Colors.deepPurple,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                padding: EdgeInsets.symmetric(horizontal: 40), // Sets the horizontal padding
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                padding: EdgeInsets.symmetric(horizontal: 40),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                _showLoginSnackbar(context);
+              },
+              child: Text(login.signupButtonText),
+              style: ElevatedButton.styleFrom(
+                primary: Colors.deepPurple,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                padding: EdgeInsets.symmetric(horizontal: 40),
               ),
             ),
           ],
@@ -67,7 +76,7 @@ class _LoginScreenState extends State<LoginScreen> {
       );
   }
   void _showLoginSnackbar(BuildContext context) {
-    final snackBar = SnackBar(content: Text('Login is not implemented yet'));
+    final snackBar = SnackBar(content: Text(login.loginSnackbarMessage));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
