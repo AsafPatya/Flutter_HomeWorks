@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
-import '../Data/login.dart';
+import '../Data/login_data.dart';
+import '../firebase_wrapper/auth_repository.dart';
+import '../Screens/saved_suggestions_screen.dart';
+import 'package:english_words/english_words.dart';
+import '../Screens/startup_name_generator_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
 
@@ -10,15 +17,16 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final double fontSize = 16;
   final double paddingSize = 16;
-  final TextEditingController txtHeight = TextEditingController();
-  final TextEditingController txtWeight = TextEditingController();
-  final Login login = Login();
+  TextEditingController _txtEmail = TextEditingController(text: "");
+  TextEditingController _txtPassword = TextEditingController(text: "");
+  final LoginData loginData = LoginData();
+  final AuthRepository _authRepository = AuthRepository.instance();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(login.appBarLogin,
+        title: Text(loginData.appBarLogin,
           style: TextStyle(
             color: Colors.white,
           ),
@@ -28,32 +36,32 @@ class _LoginScreenState extends State<LoginScreen> {
           children: [
             Padding(
               padding: EdgeInsets.only(top: paddingSize),
-              child: Text(login.welcomeMessage,
+              child: Text(loginData.welcomeMessage,
                   style: TextStyle(fontSize: fontSize),
                   textAlign: TextAlign.center
               ),
             ),
             Padding(
               child: TextField(
-                controller: txtHeight,
+                controller: _txtEmail,
                 keyboardType: TextInputType.text,
-                decoration: InputDecoration(hintText: login.initialHintEmail),
+                decoration: InputDecoration(hintText: loginData.initialHintEmail),
               ),
               padding: EdgeInsets.all(paddingSize),
             ),
             Padding(
               child: TextField(
-                controller: txtWeight,
+                controller: _txtPassword,
                 keyboardType: TextInputType.text,
-                decoration: InputDecoration(hintText: login.initialHintPassword),
+                decoration: InputDecoration(hintText: loginData.initialHintPassword),
               ),
               padding: EdgeInsets.all(paddingSize),
             ),
             ElevatedButton(
               onPressed: () {
-                _showLoginSnackbar(context);
+                _tryLogin();
               },
-              child: Text(login.loginButtonText),
+              child: Text(loginData.loginButtonText),
               style: ElevatedButton.styleFrom(
                 primary: Colors.deepPurple,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
@@ -62,9 +70,9 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             ElevatedButton(
               onPressed: () {
-                _showLoginSnackbar(context);
+                _trySignIn();
               },
-              child: Text(login.signupButtonText),
+              child: Text(loginData.signupButtonText),
               style: ElevatedButton.styleFrom(
                 primary: Colors.deepPurple,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
@@ -75,9 +83,27 @@ class _LoginScreenState extends State<LoginScreen> {
         )
       );
   }
-  void _showLoginSnackbar(BuildContext context) {
-    final snackBar = SnackBar(content: Text(login.loginSnackbarMessage));
+
+  void _showLoginSnackbar(BuildContext context, String textToShow) {
+    final snackBar = SnackBar(content: Text(textToShow));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
+  void _tryLogin() async{
+    if (await _authRepository.signIn(_txtEmail.text, _txtPassword.text)){
+      Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context){return RandomWordsScreen();})
+      );
+    } else {
+      _showLoginSnackbar(context, loginData.loginSnackbarErrorMessage);
+    }
+  }
+
+  void _trySignIn() async{
+    if (await _authRepository.signUp(_txtEmail.text, _txtPassword.text) != null){
+      Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context){return RandomWordsScreen();})
+      );
+    } else {
+      _showLoginSnackbar(context, loginData.loginSnackbarErrorMessage);
+    }
+  }
 }

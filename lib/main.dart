@@ -3,11 +3,13 @@ import 'package:english_words/english_words.dart';
 import 'Screens/startup_name_generator_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'Screens/login_screen.dart';
+import 'package:provider/provider.dart';
+import 'firebase_wrapper/auth_repository.dart';
 
-
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MyApp());
+  await Firebase.initializeApp();
+  runApp(App());
 }
 
 class App extends StatelessWidget {
@@ -37,16 +39,34 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Startup Name Generator',
-      theme: ThemeData(
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.deepPurple,
-          foregroundColor: Colors.white,
+    checkFirebase();
+    print("asaaf");
+    return MultiProvider(
+      providers:[
+        ChangeNotifierProvider<AuthRepository>(
+            create: (_) => AuthRepository.instance()),
+      ] ,
+      child: MaterialApp(
+        title: 'Startup Name Generator',
+        theme: ThemeData(
+          appBarTheme: const AppBarTheme(
+            backgroundColor: Colors.deepPurple,
+            foregroundColor: Colors.white,
+          ),
         ),
-      ),
-      home: LoginScreen(),
+        home: RandomWordsScreen(),
+      )
     );
+  }
+}
+
+void checkFirebase() {
+  FirebaseApp app = Firebase.app();
+  FirebaseOptions options = app.options;
+  if (options != null) {
+    print('Firebase is connected to ${options.projectId}');
+  } else {
+    print('Firebase is not connected');
   }
 }
 
