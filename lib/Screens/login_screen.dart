@@ -15,12 +15,12 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final double fontSize = 16;
-  final double paddingSize = 16;
   TextEditingController _txtEmail = TextEditingController(text: "");
   TextEditingController _txtPassword = TextEditingController(text: "");
   final LoginData loginData = LoginData();
   final AuthRepository _authRepository = AuthRepository.instance();
+  String? _lastButtonPressed;
+
 
   @override
   Widget build(BuildContext context) {
@@ -35,9 +35,9 @@ class _LoginScreenState extends State<LoginScreen> {
       body: Column(
           children: [
             Padding(
-              padding: EdgeInsets.only(top: paddingSize),
+              padding: EdgeInsets.only(top: loginData.paddingSize),
               child: Text(loginData.welcomeMessage,
-                  style: TextStyle(fontSize: fontSize),
+                  style: TextStyle(fontSize: loginData.fontSize),
                   textAlign: TextAlign.center
               ),
             ),
@@ -47,7 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 keyboardType: TextInputType.text,
                 decoration: InputDecoration(hintText: loginData.initialHintEmail),
               ),
-              padding: EdgeInsets.all(paddingSize),
+              padding: EdgeInsets.all(loginData.paddingSize),
             ),
             Padding(
               child: TextField(
@@ -55,22 +55,32 @@ class _LoginScreenState extends State<LoginScreen> {
                 keyboardType: TextInputType.text,
                 decoration: InputDecoration(hintText: loginData.initialHintPassword),
               ),
-              padding: EdgeInsets.all(paddingSize),
+              padding: EdgeInsets.all(loginData.paddingSize),
             ),
-            ElevatedButton(
-              onPressed: () {
-                _tryLogin();
-              },
-              child: Text(loginData.loginButtonText),
-              style: ElevatedButton.styleFrom(
-                primary: Colors.deepPurple,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                padding: EdgeInsets.symmetric(horizontal: 40),
+            _authRepository.status == Status.Authenticating && _lastButtonPressed == 'login'?
+              Center(child: CircularProgressIndicator()) :
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    _tryLogin();
+                    _lastButtonPressed = 'login'; // Set the last button pressed to 'login'
+                  });
+                },
+                child: Text(loginData.loginButtonText),
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.deepPurple,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                  padding: EdgeInsets.symmetric(horizontal: 40),
+                ),
               ),
-            ),
+            _authRepository.status == Status.Authenticating && _lastButtonPressed == 'signup'?
+            Center(child: CircularProgressIndicator()) :
             ElevatedButton(
               onPressed: () {
-                _trySignIn();
+                setState(() {
+                  _trySignIn();
+                  _lastButtonPressed = 'signup'; // Set the last button pressed to 'signup'
+                });
               },
               child: Text(loginData.signupButtonText),
               style: ElevatedButton.styleFrom(
@@ -91,8 +101,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _tryLogin() async{
     if (await _authRepository.signIn(_txtEmail.text, _txtPassword.text)){
-      Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context){return RandomWordsScreen();})
-      );
+      Navigator.of(context).pop(context);
     } else {
       _showLoginSnackbar(context, loginData.loginSnackbarErrorMessage);
     }
@@ -100,8 +109,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _trySignIn() async{
     if (await _authRepository.signUp(_txtEmail.text, _txtPassword.text) != null){
-      Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context){return RandomWordsScreen();})
-      );
+      Navigator.of(context).pop(context);
     } else {
       _showLoginSnackbar(context, loginData.loginSnackbarErrorMessage);
     }

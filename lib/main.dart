@@ -40,12 +40,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     checkFirebase();
-    print("asaaf");
-    return MultiProvider(
-      providers:[
-        ChangeNotifierProvider<AuthRepository>(
-            create: (_) => AuthRepository.instance()),
-      ] ,
+    return ChangeNotifierProvider(
+      create: (ctx) => AuthRepository.instance(),
       child: MaterialApp(
         title: 'Startup Name Generator',
         theme: ThemeData(

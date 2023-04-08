@@ -11,8 +11,12 @@ class AuthRepository with ChangeNotifier{
   Status _status = Status.Uninitialized;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  AuthRepository.instance(): _auth = FirebaseAuth.instance{
+  Status get status => _status;
+
+  AuthRepository.instance(): _auth = FirebaseAuth.instance {
     _auth.authStateChanges().listen(_onAuthStateChanged);
+    _user = _auth.currentUser;
+    _onAuthStateChanged(_user);
   }
 
   Future<void> _onAuthStateChanged(User? firebaseUser) async {
@@ -31,6 +35,7 @@ class AuthRepository with ChangeNotifier{
       _status = Status.Authenticating;
       notifyListeners();
       await _auth.signInWithEmailAndPassword(email: email, password: password);
+      _status = Status.Authenticated;
       return true;
     }
     catch (e) {
