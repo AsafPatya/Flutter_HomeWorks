@@ -11,4 +11,7 @@ class LoginData{
   String loginSnackbarErrorMessage = 'There was an error logging into the app';
   final double fontSize = 16;
   final double paddingSize = 16;
+  String loginButton = 'login';
+  String signUpButton = 'signUp';
 }
+

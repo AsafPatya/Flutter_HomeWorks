@@ -21,7 +21,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final AuthRepository _authRepository = AuthRepository.instance();
   String? _lastButtonPressed;
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,13 +56,13 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               padding: EdgeInsets.all(loginData.paddingSize),
             ),
-            _authRepository.status == Status.Authenticating && _lastButtonPressed == 'login'?
+            _authRepository.status == Status.Authenticating && _lastButtonPressed == loginData.loginButton ?
               Center(child: CircularProgressIndicator()) :
               ElevatedButton(
                 onPressed: () {
                   setState(() {
                     _tryLogin();
-                    _lastButtonPressed = 'login'; // Set the last button pressed to 'login'
+                    _lastButtonPressed = loginData.loginButton; // Set the last button pressed to 'login'
                   });
                 },
                 child: Text(loginData.loginButtonText),
@@ -73,13 +72,13 @@ class _LoginScreenState extends State<LoginScreen> {
                   padding: EdgeInsets.symmetric(horizontal: 40),
                 ),
               ),
-            _authRepository.status == Status.Authenticating && _lastButtonPressed == 'signup'?
+            _authRepository.status == Status.Authenticating && _lastButtonPressed == loginData.signUpButton ?
             Center(child: CircularProgressIndicator()) :
             ElevatedButton(
               onPressed: () {
                 setState(() {
                   _trySignIn();
-                  _lastButtonPressed = 'signup'; // Set the last button pressed to 'signup'
+                  _lastButtonPressed = loginData.signUpButton; // Set the last button pressed to 'signup'
                 });
               },
               child: Text(loginData.signupButtonText),
