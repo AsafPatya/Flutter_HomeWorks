@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:english_words/english_words.dart';
-import 'Screens/startup_name_generator_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'Screens/login_screen.dart';
 import 'package:provider/provider.dart';
+
+import 'screens/suggestions_screen.dart';
+import 'screens/login_screen.dart';
 import 'firebase_wrapper/auth_repository.dart';
+import 'global/resources.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -43,14 +45,14 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (ctx) => AuthRepository.instance(),
       child: MaterialApp(
-        title: 'Startup Name Generator',
+        title: strAPP_TITLE,
         theme: ThemeData(
           appBarTheme: const AppBarTheme(
             backgroundColor: Colors.deepPurple,
             foregroundColor: Colors.white,
           ),
         ),
-        home: RandomWordsScreen(),
+        home: SuggestionScreen(),
       )
     );
   }

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:english_words/english_words.dart';
+import '../global/util.dart';
+import 'dart:developer';
+
 import '../Data/login_data.dart';
 import '../firebase_wrapper/auth_repository.dart';
 import '../Screens/saved_suggestions_screen.dart';
-import 'package:english_words/english_words.dart';
-import '../Screens/startup_name_generator_screen.dart';
+import '../Screens/suggestions_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 
@@ -93,16 +96,11 @@ class _LoginScreenState extends State<LoginScreen> {
       );
   }
 
-  void _showLoginSnackbar(BuildContext context, String textToShow) {
-    final snackBar = SnackBar(content: Text(textToShow));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
-
   void _tryLogin() async{
     if (await _authRepository.signIn(_txtEmail.text, _txtPassword.text)){
       Navigator.of(context).pop(context);
     } else {
-      _showLoginSnackbar(context, loginData.loginSnackbarErrorMessage);
+      displaySnackBar(context, loginData.loginSnackbarErrorMessage);
     }
   }
 
@@ -110,7 +108,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (await _authRepository.signUp(_txtEmail.text, _txtPassword.text) != null){
       Navigator.of(context).pop(context);
     } else {
-      _showLoginSnackbar(context, loginData.loginSnackbarErrorMessage);
+      displaySnackBar(context, loginData.loginSnackbarErrorMessage);
     }
   }
 }

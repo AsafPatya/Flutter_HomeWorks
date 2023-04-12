@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:english_words/english_words.dart';
 
+import '../global/resources.dart';
+import '../global/util.dart';
+import '../global/constants.dart';
+
 class SavedSuggestionsScreen extends StatefulWidget {
   var _saved = <WordPair>{};
 
@@ -11,12 +15,10 @@ class SavedSuggestionsScreen extends StatefulWidget {
 }
 
 class _SavedSuggestionsScreenState extends State<SavedSuggestionsScreen> {
-  final _biggerFont = const TextStyle(fontSize: 18);
 
   @override
   Widget build(BuildContext context) {
-    final tiles = widget._saved.map(
-          (pair) {
+    final tiles = widget._saved.map( (pair) {
         return Dismissible(
           key: Key(pair.toString()),
           background: Container(
@@ -35,8 +37,24 @@ class _SavedSuggestionsScreenState extends State<SavedSuggestionsScreen> {
           direction: DismissDirection.horizontal,
           confirmDismiss: (direction) async {
             if (direction == DismissDirection.endToStart || direction == DismissDirection.startToEnd) {
-              // User swiped from right to left or left to right (i.e. dismissed the item)
-              _showSavedSuggestionSnackbar(context);
+              displayAlertDialog(context, strDELETE_SUGGESTION, strDELETE_SUGGESTION_ALERT.replaceFirst("%", pair.asPascalCase),
+                  <Widget>[
+                    ElevatedButton(
+                      onPressed: (){} ,
+                      child: Text(strYES),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryColor
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: (){} ,
+                      child: Text(strNO),
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: primaryColor
+                      ),
+                    ),
+                  ]
+              );
               return false;
             }
           },
@@ -44,7 +62,7 @@ class _SavedSuggestionsScreenState extends State<SavedSuggestionsScreen> {
           child: ListTile(
             title: Text(
               pair.asPascalCase,
-              style: _biggerFont,
+              style: biggerFont,
             ),
           ),
         );
@@ -59,10 +77,6 @@ class _SavedSuggestionsScreenState extends State<SavedSuggestionsScreen> {
       body: ListView(children: divided),
       // Show Snackbar when Login button is pressed
     );
-  }
-  void _showSavedSuggestionSnackbar(BuildContext context) {
-    final snackBar = SnackBar(content: Text('Deletion is not implemented yet'));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }
 

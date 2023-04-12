@@ -2,6 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:developer';
+
+import '../global/resources.dart';
 
 enum Status {Authenticating, Unauthenticated, Uninitialized, Authenticated}
 
@@ -34,8 +37,11 @@ class AuthRepository with ChangeNotifier{
     try {
       _status = Status.Authenticating;
       notifyListeners();
+      log('${strLOGGER_IDENTIFIER} trying to sign in with email: ${email} ${strLOGGER_IDENTIFIER}');
       await _auth.signInWithEmailAndPassword(email: email, password: password);
+      log('${strLOGGER_IDENTIFIER} sign in succeed with email: ${email} ${strLOGGER_IDENTIFIER}');
       _status = Status.Authenticated;
+      notifyListeners();
       return true;
     }
     catch (e) {
@@ -58,5 +64,13 @@ class AuthRepository with ChangeNotifier{
       notifyListeners();
       return null;
     }
+  }
+
+  Future signOut() async {
+    _auth.signOut();
+    _status = Status.Unauthenticated;
+    _user = null;
+    notifyListeners();
+    return Future.delayed(Duration.zero);
   }
 }
