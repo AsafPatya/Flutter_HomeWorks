@@ -5,12 +5,13 @@ import 'package:flutter/material.dart';
 const String savedSuggestionsCollection = "saved_suggestions";
 const String savedSuggestionsCollectionField = "Pair";
 const String avatarsCollection = "avatars";
-const String storageBucketPath = "gs://hellome-1a08e.appspot.com";
+const String storageBucketPath = "gs://hellome-4ba07.appspot.com";
 
 // Colors
 const Color primaryColor = Colors.deepPurple;
 const Color secondaryColor = Colors.white;
 const Color specialButtonColor = Colors.blue;
+const Color removeSuggestionColor = Colors.red;
 Color welcomeColor = Colors.grey.shade300;
 Color labelPasswordColor = Colors.black54;
 

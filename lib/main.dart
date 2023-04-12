@@ -6,11 +6,13 @@ import 'package:provider/provider.dart';
 import 'screens/suggestions_screen.dart';
 import 'screens/login_screen.dart';
 import 'firebase_wrapper/auth_repository.dart';
+import 'firebase_wrapper/storage_repository.dart';
 import 'global/resources.dart';
+import 'global/constants.dart' as gc; // GlobalConst
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
   runApp(App());
 }
 
@@ -41,20 +43,25 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    checkFirebase();
-    return ChangeNotifierProvider(
-      create: (ctx) => AuthRepository.instance(),
-      child: MaterialApp(
-        title: strAPP_TITLE,
-        theme: ThemeData(
-          appBarTheme: const AppBarTheme(
-            backgroundColor: Colors.deepPurple,
-            foregroundColor: Colors.white,
+    return MultiProvider(
+        providers: [
+          ChangeNotifierProvider<AuthRepository>(
+              create: (_) => AuthRepository.instance()),
+          ChangeNotifierProxyProvider<AuthRepository, SavedSuggestionsStore>(
+            create: (BuildContext context) => SavedSuggestionsStore.instance(Provider.of<AuthRepository>(context, listen: false)),
+            update: (BuildContext context, AuthRepository auth, SavedSuggestionsStore? saved) => saved!..updates(auth),
+          )
+        ],
+        child: MaterialApp(
+          title: strAPP_TITLE,
+          theme: ThemeData(
+            appBarTheme: const AppBarTheme(
+              backgroundColor: gc.primaryColor,
+              foregroundColor: gc.secondaryColor,
+            ),
           ),
-        ),
-        home: SuggestionScreen(),
-      )
-    );
+          home:  SuggestionScreen(),
+        ));
   }
 }
 

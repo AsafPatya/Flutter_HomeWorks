@@ -2,16 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:english_words/english_words.dart';
 import '../global/util.dart';
 import 'dart:developer';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../Data/login_data.dart';
 import '../firebase_wrapper/auth_repository.dart';
 import '../Screens/saved_suggestions_screen.dart';
 import '../Screens/suggestions_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import '../firebase_wrapper/storage_repository.dart';
+import '../global/constants.dart' as gc; // GlobalConst
 
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  final AuthRepository _authRepository;
+  final SavedSuggestionsStore _savedSuggestions;
+  LoginScreen(this._authRepository, this._savedSuggestions);
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -21,7 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController _txtEmail = TextEditingController(text: "");
   TextEditingController _txtPassword = TextEditingController(text: "");
   final LoginData loginData = LoginData();
-  final AuthRepository _authRepository = AuthRepository.instance();
+
   String? _lastButtonPressed;
 
   @override
@@ -59,7 +63,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               padding: EdgeInsets.all(loginData.paddingSize),
             ),
-            _authRepository.status == Status.Authenticating && _lastButtonPressed == loginData.loginButton ?
+            widget._authRepository.status == Status.Authenticating && _lastButtonPressed == loginData.loginButton ?
               Center(child: CircularProgressIndicator()) :
               ElevatedButton(
                 onPressed: () {
@@ -75,7 +79,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   padding: EdgeInsets.symmetric(horizontal: 40),
                 ),
               ),
-            _authRepository.status == Status.Authenticating && _lastButtonPressed == loginData.signUpButton ?
+            widget._authRepository.status == Status.Authenticating && _lastButtonPressed == loginData.signUpButton ?
             Center(child: CircularProgressIndicator()) :
             ElevatedButton(
               onPressed: () {
@@ -97,7 +101,9 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _tryLogin() async{
-    if (await _authRepository.signIn(_txtEmail.text, _txtPassword.text)){
+    if (await widget._authRepository.signIn(_txtEmail.text, _txtPassword.text)){
+      await widget._savedSuggestions.pullSaved();
+      await widget._savedSuggestions.pushSaved();
       Navigator.of(context).pop(context);
     } else {
       displaySnackBar(context, loginData.loginSnackbarErrorMessage);
@@ -105,7 +111,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _trySignIn() async{
-    if (await _authRepository.signUp(_txtEmail.text, _txtPassword.text) != null){
+    if (await widget._authRepository.signUp(_txtEmail.text, _txtPassword.text) != null){
       Navigator.of(context).pop(context);
     } else {
       displaySnackBar(context, loginData.loginSnackbarErrorMessage);
