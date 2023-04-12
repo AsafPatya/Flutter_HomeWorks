@@ -21,7 +21,7 @@ class _SavedSuggestionsScreenState extends State<SavedSuggestionsScreen> {
     return Dismissible(
       child: ListTile(
         title: Text(pair,
-          style: biggerFont,
+          style: textFont,
         ),
       ),
       key: ValueKey<String>(pair),
@@ -42,14 +42,21 @@ class _SavedSuggestionsScreenState extends State<SavedSuggestionsScreen> {
           displayAlertDialog(context, strDELETE_SUGGESTION, strDELETE_SUGGESTION_ALERT.replaceFirst("%", pair),
               <Widget>[
                 ElevatedButton(
-                  onPressed: (){} ,
+                  onPressed: () {
+                    setState(() {
+                      widget._savedSuggestions.deletePair(pair);
+                      Navigator.pop(context);
+                    });
+                  },
                   child: Text(strYES),
                   style: ElevatedButton.styleFrom(
                       backgroundColor: primaryColor
                   ),
                 ),
                 ElevatedButton(
-                  onPressed: (){} ,
+                  onPressed: (){
+                    Navigator.pop(context);
+                  } ,
                   child: Text(strNO),
                   style: ElevatedButton.styleFrom(
                       backgroundColor: primaryColor

@@ -61,7 +61,7 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
     return ListTile(
       title: Text(
         pair,
-        style: gc.biggerFont,
+        style: gc.textFont,
       ),
       trailing: Icon(
         alreadySaved ? gc.favoriteIcon : gc.favoriteIconBorder,
