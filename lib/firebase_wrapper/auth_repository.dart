@@ -3,31 +3,34 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:developer';
+import 'package:firebase_storage/firebase_storage.dart';
 
 import '../global/resources.dart';
+import '../global/constants.dart' as gc; // GlobalConst
+
 
 enum Status {Authenticating, Unauthenticated, Uninitialized, Authenticated}
 
 class AuthRepository with ChangeNotifier{
   final FirebaseAuth _auth;
-  User? _user;
+  User? user;
   Status _status = Status.Uninitialized;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseStorage _storage = FirebaseStorage.instanceFor(bucket: gc.storageBucketPath);
 
   Status get status => _status;
 
   AuthRepository.instance(): _auth = FirebaseAuth.instance {
     _auth.authStateChanges().listen(_onAuthStateChanged);
-    _user = _auth.currentUser;
-    _onAuthStateChanged(_user);
+    user = _auth.currentUser;
+    _onAuthStateChanged(user);
   }
 
   Future<void> _onAuthStateChanged(User? firebaseUser) async {
     if (firebaseUser == null) {
-      _user = null;
+      user = null;
       _status = Status.Unauthenticated;
     } else {
-      _user = firebaseUser;
+      user = firebaseUser;
       _status = Status.Authenticated;
     }
     notifyListeners();
@@ -69,7 +72,8 @@ class AuthRepository with ChangeNotifier{
   Future signOut() async {
     _auth.signOut();
     _status = Status.Unauthenticated;
-    _user = null;
+    log('${strLOGGER_IDENTIFIER} sign out succeed with email: ${user?.email} ${strLOGGER_IDENTIFIER}');
+    user = null;
     notifyListeners();
     return Future.delayed(Duration.zero);
   }
