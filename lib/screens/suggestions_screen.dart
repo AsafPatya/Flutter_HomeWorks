@@ -22,12 +22,7 @@ class SuggestionScreen extends StatefulWidget {
 class _SuggestionScreenState extends State<SuggestionScreen> {
   final _suggestions = <WordPair>[];
 
-  void _showSavedSuggestionSnackbar(BuildContext context) {
-    final snackBar = SnackBar(content: Text('Deletion is not implemented yet'));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
-
-  void _pushSaved(SavedSuggestionsStore savedSuggestions){
+  void _pushSavedSuggestionScreen(SavedSuggestionsStore savedSuggestions){
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (BuildContext context){
@@ -37,7 +32,7 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
     );
   }
 
-  void _pushLogin(AuthRepository authRepository, SavedSuggestionsStore savedSuggestions){
+  void _pushLoginScreen(AuthRepository authRepository, SavedSuggestionsStore savedSuggestions){
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (BuildContext context){
@@ -47,20 +42,20 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
     );
   }
 
-  void _pushLogout(AuthRepository authRepository, SavedSuggestionsStore savedSuggestions){
+  void _pushLogOut(AuthRepository authRepository, SavedSuggestionsStore savedSuggestions){
     authRepository.signOut();
     savedSuggestions.clearPairs(context);
     displaySnackBar(context, strLOGOUT_SUCCESSFULLY);
   }
 
-  Widget _buildRow(String pair, SavedSuggestionsStore _savedSuggestions) {
-    if (_savedSuggestions.saved == null) {
+  Widget _buildRow(String pair, SavedSuggestionsStore savedSuggestions) {
+    Set<String>? saved = savedSuggestions.saved;
+    if (saved == null) {
       return Container();
     }
-    final alreadySaved = _savedSuggestions.saved!.contains(pair);
+    final alreadySaved = saved!.contains(pair);
     return ListTile(
-      title: Text(
-        pair,
+      title: Text(pair,
         style: gc.textFont,
       ),
       trailing: Icon(
@@ -71,9 +66,9 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
       onTap: () {
         setState(() {
           if (alreadySaved) {
-            _savedSuggestions.deletePair(pair);
+            savedSuggestions.deletePair(pair);
           } else {
-            _savedSuggestions.addPair(pair);
+            savedSuggestions.addPair(pair);
           }
         });
       },
@@ -89,35 +84,35 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
                 title: Text(strAPP_TITLE),
                 actions: [
                   IconButton(
-                    icon: const Icon(Icons.star),
+                    icon: const Icon(gc.favoriteIcon),
                     onPressed: () {
-                          _pushSaved(savedSuggestions);
+                          _pushSavedSuggestionScreen(savedSuggestions);
                     },
-                    tooltip: 'Saved Suggestions',
+                    tooltip: strSAVED_SUGGESTIONS,
                   ),
                   authRepository.status == Status.Authenticated
                       ? IconButton(
-                          icon: const Icon(Icons.exit_to_app),
+                          icon: const Icon(gc.authenticatedIcon),
                           onPressed: (){
                             setState(() {
-                                _pushLogout(authRepository, savedSuggestions);
+                                _pushLogOut(authRepository, savedSuggestions);
                             });
                           }
                       )
                       : IconButton(
-                          icon: const Icon(Icons.login),
-                          onPressed: () => _pushLogin(authRepository, savedSuggestions),
+                          icon: const Icon(gc.unauthenticatedIcon),
+                          onPressed: () => _pushLoginScreen(authRepository, savedSuggestions),
                   )
                 ],
               ),
               body: ListView.builder(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(gc.suggestionsPadding),
                 itemBuilder: (context, i) {
                   if (i.isOdd) return const Divider();
 
                   final index = i ~/ 2;
                   if (index >= _suggestions.length) {
-                    _suggestions.addAll(generateWordPairs().take(10));
+                    _suggestions.addAll(generateWordPairs().take(gc.generateMoreWords));
                   }
 
                   return _buildRow(_suggestions[index].asPascalCase.toString(), savedSuggestions);

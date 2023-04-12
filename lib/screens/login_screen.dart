@@ -11,7 +11,6 @@ import '../Screens/suggestions_screen.dart';
 import '../firebase_wrapper/storage_repository.dart';
 import '../global/constants.dart' as gc; // GlobalConst
 
-
 class LoginScreen extends StatefulWidget {
   final AuthRepository _authRepository;
   final SavedSuggestionsStore _savedSuggestions;

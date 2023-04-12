@@ -10,7 +10,6 @@ import 'firebase_wrapper/storage_repository.dart';
 import 'global/resources.dart';
 import 'global/constants.dart' as gc; // GlobalConst
 
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(App());
@@ -49,7 +48,7 @@ class MyApp extends StatelessWidget {
               create: (_) => AuthRepository.instance()),
           ChangeNotifierProxyProvider<AuthRepository, SavedSuggestionsStore>(
             create: (BuildContext context) => SavedSuggestionsStore.instance(Provider.of<AuthRepository>(context, listen: false)),
-            update: (BuildContext context, AuthRepository auth, SavedSuggestionsStore? saved) => saved!..updates(auth),
+            update: (BuildContext context, AuthRepository auth, SavedSuggestionsStore? saved) => saved!..updates(auth)
           )
         ],
         child: MaterialApp(
@@ -64,16 +63,4 @@ class MyApp extends StatelessWidget {
         ));
   }
 }
-
-void checkFirebase() {
-  FirebaseApp app = Firebase.app();
-  FirebaseOptions options = app.options;
-  if (options != null) {
-    print('Firebase is connected to ${options.projectId}');
-  } else {
-    print('Firebase is not connected');
-  }
-}
-
-
 
