@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:english_words/english_words.dart';
-import '../global/util.dart';
+import '../data/util.dart';
 import 'dart:developer';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import '../Data/login_data.dart';
 import '../firebase_wrapper/auth_repository.dart';
+import '../firebase_wrapper/storage_repository.dart';
 import '../Screens/saved_suggestions_screen.dart';
 import '../Screens/suggestions_screen.dart';
-import '../firebase_wrapper/storage_repository.dart';
-import '../global/constants.dart' as gc; // GlobalConst
+import '../data/global_data.dart' as global_data;
+import '../data/login_data.dart' as login_data;
 
 class LoginScreen extends StatefulWidget {
   final AuthRepository _authRepository;
@@ -21,9 +21,8 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  TextEditingController _txtEmail = TextEditingController(text: "");
-  TextEditingController _txtPassword = TextEditingController(text: "");
-  final LoginData loginData = LoginData();
+  TextEditingController _txtEmail = TextEditingController(text: login_data.emptyString);
+  TextEditingController _txtPassword = TextEditingController(text: login_data.emptyString);
 
   String? _lastButtonPressed;
 
@@ -31,18 +30,16 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(loginData.appBarLogin,
-          style: TextStyle(
-            color: Colors.white,
-          ),
+        title: Text(login_data.appBarLogin,
+          style: TextStyle(color: global_data.secondaryColor)
         ),
       ),
       body: Column(
           children: [
             Padding(
-              padding: EdgeInsets.only(top: loginData.paddingSize),
-              child: Text(loginData.welcomeMessage,
-                  style: TextStyle(fontSize: loginData.fontSize),
+              padding: EdgeInsets.only(top: global_data.paddingSize),
+              child: Text(login_data.welcomeMessage,
+                  style: TextStyle(fontSize: global_data.fontSize),
                   textAlign: TextAlign.center
               ),
             ),
@@ -50,44 +47,44 @@ class _LoginScreenState extends State<LoginScreen> {
               child: TextField(
                 controller: _txtEmail,
                 keyboardType: TextInputType.text,
-                decoration: InputDecoration(hintText: loginData.initialHintEmail),
+                decoration: InputDecoration(hintText: login_data.initialHintEmail),
               ),
-              padding: EdgeInsets.all(loginData.paddingSize),
+              padding: EdgeInsets.all(global_data.paddingSize),
             ),
             Padding(
               child: TextField(
                 controller: _txtPassword,
                 keyboardType: TextInputType.text,
-                decoration: InputDecoration(hintText: loginData.initialHintPassword),
+                decoration: InputDecoration(hintText: login_data.initialHintPassword),
               ),
-              padding: EdgeInsets.all(loginData.paddingSize),
+              padding: EdgeInsets.all(global_data.paddingSize),
             ),
-            widget._authRepository.status == Status.Authenticating && _lastButtonPressed == loginData.loginButton ?
+            widget._authRepository.status == Status.Authenticating && _lastButtonPressed == login_data.loginButton ?
               Center(child: CircularProgressIndicator()) :
               ElevatedButton(
                 onPressed: () {
                   setState(() {
                     _tryLogin();
-                    _lastButtonPressed = loginData.loginButton; // Set the last button pressed to 'login'
+                    _lastButtonPressed = login_data.loginButton; // Set the last button pressed to 'login'
                   });
                 },
-                child: Text(loginData.loginButtonText),
+                child: Text(login_data.loginButtonText),
                 style: ElevatedButton.styleFrom(
                   primary: Colors.deepPurple,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                   padding: EdgeInsets.symmetric(horizontal: 40),
                 ),
               ),
-            widget._authRepository.status == Status.Authenticating && _lastButtonPressed == loginData.signUpButton ?
+            widget._authRepository.status == Status.Authenticating && _lastButtonPressed == login_data.signUpButton ?
             Center(child: CircularProgressIndicator()) :
             ElevatedButton(
               onPressed: () {
                 setState(() {
                   _trySignIn();
-                  _lastButtonPressed = loginData.signUpButton; // Set the last button pressed to 'signup'
+                  _lastButtonPressed = login_data.signUpButton; // Set the last button pressed to 'signup'
                 });
               },
-              child: Text(loginData.signupButtonText),
+              child: Text(login_data.signupButtonText),
               style: ElevatedButton.styleFrom(
                 primary: Colors.deepPurple,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
@@ -105,7 +102,11 @@ class _LoginScreenState extends State<LoginScreen> {
       await widget._savedSuggestions.pushSaved();
       Navigator.of(context).pop(context);
     } else {
-      displaySnackBar(context, loginData.loginSnackbarErrorMessage);
+      displaySnackBar(context, login_data.loginSnackbarErrorMessage);
+      Future.delayed(Duration(seconds: 1), () {
+        setState(() {});
+      }
+      );
     }
   }
 
@@ -113,7 +114,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (await widget._authRepository.signUp(_txtEmail.text, _txtPassword.text) != null){
       Navigator.of(context).pop(context);
     } else {
-      displaySnackBar(context, loginData.loginSnackbarErrorMessage);
+      displaySnackBar(context, login_data.loginSnackbarErrorMessage);
     }
   }
 }

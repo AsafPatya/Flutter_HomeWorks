@@ -5,8 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:developer';
 import 'package:firebase_storage/firebase_storage.dart';
 
-import '../global/resources.dart';
-import '../global/constants.dart' as gc; // GlobalConst
+import '../data/global_data.dart' as global_data;
 
 
 enum Status {Authenticating, Unauthenticated, Uninitialized, Authenticated}
@@ -15,7 +14,7 @@ class AuthRepository with ChangeNotifier{
   final FirebaseAuth _auth;
   User? user;
   Status _status = Status.Uninitialized;
-  final FirebaseStorage _storage = FirebaseStorage.instanceFor(bucket: gc.storageBucketPath);
+  final FirebaseStorage _storage = FirebaseStorage.instanceFor(bucket: global_data.storageBucketPath);
 
   Status get status => _status;
 
@@ -40,9 +39,9 @@ class AuthRepository with ChangeNotifier{
     try {
       _status = Status.Authenticating;
       notifyListeners();
-      log('${strLOGGER_IDENTIFIER} trying to sign in with email: ${email} ${strLOGGER_IDENTIFIER}');
+      log('${global_data.loggerIdentifier} trying to sign in with email: ${email} ${global_data.loggerIdentifier}');
       await _auth.signInWithEmailAndPassword(email: email, password: password);
-      log('${strLOGGER_IDENTIFIER} sign in succeed with email: ${email} ${strLOGGER_IDENTIFIER}');
+      log('${global_data.loggerIdentifier} sign in succeed with email: ${email} ${global_data.loggerIdentifier}');
       _status = Status.Authenticated;
       notifyListeners();
       return true;
@@ -72,7 +71,7 @@ class AuthRepository with ChangeNotifier{
   Future signOut() async {
     _auth.signOut();
     _status = Status.Unauthenticated;
-    log('${strLOGGER_IDENTIFIER} sign out succeed with email: ${user?.email} ${strLOGGER_IDENTIFIER}');
+    log('${global_data.loggerIdentifier} sign out succeed with email: ${user?.email} ${global_data.loggerIdentifier}');
     user = null;
     notifyListeners();
     return Future.delayed(Duration.zero);

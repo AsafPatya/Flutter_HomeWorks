@@ -7,8 +7,7 @@ import 'screens/suggestions_screen.dart';
 import 'screens/login_screen.dart';
 import 'firebase_wrapper/auth_repository.dart';
 import 'firebase_wrapper/storage_repository.dart';
-import 'global/resources.dart';
-import 'global/constants.dart' as gc; // GlobalConst
+import 'data/global_data.dart' as global_data;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -52,11 +51,11 @@ class MyApp extends StatelessWidget {
           )
         ],
         child: MaterialApp(
-          title: strAPP_TITLE,
+          title: global_data.appTitle,
           theme: ThemeData(
             appBarTheme: const AppBarTheme(
-              backgroundColor: gc.primaryColor,
-              foregroundColor: gc.secondaryColor,
+              backgroundColor: global_data.primaryColor,
+              foregroundColor: global_data.secondaryColor,
             ),
           ),
           home:  SuggestionScreen(),

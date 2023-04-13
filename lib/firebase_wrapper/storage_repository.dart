@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'auth_repository.dart';
-import '../global/constants.dart' as gc; // GlobalConst
+import '../data/global_data.dart' as global_data;
+
 
 Set<String> localSavedSuggestions = <String>{};
 
@@ -21,17 +22,17 @@ class SavedSuggestionsStore with ChangeNotifier {
 
   Future pushSaved() async {
     if (_authRepository != null && _authRepository!.user != null) {
-      await _firestore.collection(gc.savedSuggestionsCollection).doc(_authRepository!.user!.email).set({
-        gc.savedSuggestionsCollectionField: _saved.toList(),
+      await _firestore.collection(global_data.savedSuggestionsCollection).doc(_authRepository!.user!.email).set({
+        global_data.savedSuggestionsCollectionField: _saved.toList(),
       });
     }
   }
 
   Future pullSaved() async {
     if (_authRepository != null && _authRepository!.user != null) {
-      await _firestore.collection(gc.savedSuggestionsCollection).doc(_authRepository!.user!.email).get().then((snapshot) {
+      await _firestore.collection(global_data.savedSuggestionsCollection).doc(_authRepository!.user!.email).get().then((snapshot) {
         if (snapshot.exists && snapshot.data() != null) {
-          _saved.addAll(snapshot.data()![gc.savedSuggestionsCollectionField].cast<String>());
+          _saved.addAll(snapshot.data()![global_data.savedSuggestionsCollectionField].cast<String>());
           notifyListeners();
         }
       });

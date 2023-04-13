@@ -7,9 +7,9 @@ import 'saved_suggestions_screen.dart';
 import '../Data/suggestions_data.dart';
 import '../firebase_wrapper/auth_repository.dart';
 import '../firebase_wrapper/storage_repository.dart';
-import '../global/util.dart';
-import '../global/resources.dart';
-import '../global/constants.dart' as gc; // GlobalConst
+import '../data/util.dart';
+import '../data/global_data.dart' as global_data;
+import '../data/suggestions_data.dart' as suggestions_data;
 
 
 class SuggestionScreen extends StatefulWidget {
@@ -45,7 +45,7 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
   void _pushLogOut(AuthRepository authRepository, SavedSuggestionsStore savedSuggestions){
     authRepository.signOut();
     savedSuggestions.clearPairs(context);
-    displaySnackBar(context, strLOGOUT_SUCCESSFULLY);
+    displaySnackBar(context, suggestions_data.logoutSuccessfully);
   }
 
   Widget _buildRow(String pair, SavedSuggestionsStore savedSuggestions) {
@@ -56,12 +56,12 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
     final alreadySaved = saved!.contains(pair);
     return ListTile(
       title: Text(pair,
-        style: gc.textFont,
+        style: global_data.textFont,
       ),
       trailing: Icon(
-        alreadySaved ? gc.favoriteIcon : gc.favoriteIconBorder,
-        color: alreadySaved ? gc.primaryColor : null,
-        semanticLabel: alreadySaved ? strREMOVED_FROM_SAVED : strSAVE,
+        alreadySaved ? global_data.favoriteIcon : global_data.favoriteIconBorder,
+        color: alreadySaved ? global_data.primaryColor : null,
+        semanticLabel: alreadySaved ? suggestions_data.removeFromSaved : suggestions_data.save,
       ),
       onTap: () {
         setState(() {
@@ -81,18 +81,18 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
         builder: (context, authRepository, savedSuggestions, child){
           return Scaffold(
               appBar: AppBar(
-                title: Text(strAPP_TITLE),
+                title: Text(suggestions_data.suggestionScreenTitle),
                 actions: [
                   IconButton(
-                    icon: const Icon(gc.favoriteIcon),
+                    icon: const Icon(global_data.favoriteIcon),
                     onPressed: () {
                           _pushSavedSuggestionScreen(savedSuggestions);
                     },
-                    tooltip: strSAVED_SUGGESTIONS,
+                    tooltip: suggestions_data.savedSuggestions,
                   ),
                   authRepository.status == Status.Authenticated
                       ? IconButton(
-                          icon: const Icon(gc.authenticatedIcon),
+                          icon: const Icon(global_data.authenticatedIcon),
                           onPressed: (){
                             setState(() {
                                 _pushLogOut(authRepository, savedSuggestions);
@@ -100,19 +100,19 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
                           }
                       )
                       : IconButton(
-                          icon: const Icon(gc.unauthenticatedIcon),
+                          icon: const Icon(global_data.unauthenticatedIcon),
                           onPressed: () => _pushLoginScreen(authRepository, savedSuggestions),
                   )
                 ],
               ),
               body: ListView.builder(
-                padding: const EdgeInsets.all(gc.suggestionsPadding),
+                padding: const EdgeInsets.all(global_data.suggestionsPadding),
                 itemBuilder: (context, i) {
                   if (i.isOdd) return const Divider();
 
                   final index = i ~/ 2;
                   if (index >= _suggestions.length) {
-                    _suggestions.addAll(generateWordPairs().take(gc.generateMoreWords));
+                    _suggestions.addAll(generateWordPairs().take(global_data.generateMoreWords));
                   }
 
                   return _buildRow(_suggestions[index].asPascalCase.toString(), savedSuggestions);
