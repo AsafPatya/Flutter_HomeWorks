@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:english_words/english_words.dart';
-import '../data/util.dart';
 import 'dart:developer';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -8,6 +7,7 @@ import '../firebase_wrapper/auth_repository.dart';
 import '../firebase_wrapper/storage_repository.dart';
 import '../Screens/saved_suggestions_screen.dart';
 import '../Screens/suggestions_screen.dart';
+import '../data/util.dart';
 import '../data/global_data.dart' as global_data;
 import '../data/login_data.dart' as login_data;
 
@@ -102,11 +102,9 @@ class _LoginScreenState extends State<LoginScreen> {
       await widget._savedSuggestions.pushSaved();
       Navigator.of(context).pop(context);
     } else {
-      displaySnackBar(context, login_data.loginSnackbarErrorMessage);
-      Future.delayed(Duration(seconds: 1), () {
-        setState(() {});
-      }
-      );
+      setState(() {
+        displaySnackBar(context, login_data.loginSnackbarErrorMessage);
+      });
     }
   }
 
